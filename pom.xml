@@ -13,6 +13,7 @@
   </properties>
 
   <dependencies>
+    <!-- vertx - core, web, auth-common -->
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-core</artifactId>
@@ -25,19 +26,40 @@
     </dependency>
     <dependency>
       <groupId>io.vertx</groupId>
+      <artifactId>vertx-auth-common</artifactId>
+      <version>3.5.0</version>
+      <scope>test</scope>
+    </dependency>
+
+
+    <!-- http://vertx.io/docs/vertx-mysql-postgresql-client/java/ says -->
+    <!--   vertx-mysql-postgresql-client 3.5.0 (the client) -->
+    <dependency>
+      <groupId>io.vertx</groupId>
       <artifactId>vertx-mysql-postgresql-client</artifactId>
       <version>3.5.0</version> <!-- Doc said 3.2.1? -->
     </dependency>
+    <!--  scala-library 2.11.4 -->
     <dependency>
       <groupId>org.scala-lang</groupId>
       <artifactId>scala-library</artifactId>
-      <version>2.12.4</version> <!-- doc says 2.11.4 and 2.13.0-M2 -->
+      <version>2.11.4</version> <!-- doc says 2.11.4, 2.12.4 exists and 2.13.0-M2 -->
     </dependency>
+    <!--  the postgress-async-2.11 and mysdql-async-2.11 from mauricio (gress=>gres, mysdql=>mysql)
+          see:  https://mvnrepository.com/artifact/com.github.mauricio/mysql-async -->
     <dependency>
       <groupId>com.github.mauricio</groupId>
-      <artifactId>mysql-async_2.12</artifactId>
-      <version>0.2.21</version> <!-- doc said 2.11 mysdql, not mysql...-->
+      <artifactId>mysql-async_2.11</artifactId>  <!-- 2.12 exists -->
+      <version>0.2.21</version> <!-- doc said 2.11 mysdql, not mysql, ...-->
     </dependency>
+    <!--  joda time ( https://mvnrepository.com/artifact/joda-time/joda-time ) -->
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <version>2.9.9</version>
+    </dependency>
+
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -47,12 +69,6 @@
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-unit</artifactId>
-      <version>3.5.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.vertx</groupId>
-      <artifactId>vertx-auth-common</artifactId>
       <version>3.5.0</version>
       <scope>test</scope>
     </dependency>

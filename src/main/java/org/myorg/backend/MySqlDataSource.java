@@ -28,7 +28,7 @@ public class MySqlDataSource {
 
     public void getConnection(Handler<AsyncResult<SQLConnection>> handler) {
         if (client == null)
-            handler.handle(null);
+            handler.handle(null); // can happen after the data source stops
         else
             client.getConnection(handler);
     }
@@ -67,6 +67,7 @@ public class MySqlDataSource {
     }
 
 
+
     public static void init(Vertx vertx) {
         if (dataSource != null)
             return;
@@ -75,6 +76,8 @@ public class MySqlDataSource {
             final Logger logger = LoggerFactory.getLogger(MySqlDataSource.class);
             if ((result == null) || !result.succeeded()) {
                 logger.error("Cant open a MySQL database connection to: "+connectionString);
+                if (result != null)
+                    logger.error("-- Database connection string was: ", result.cause());
                 stop();
                 vertx.close();
             } else {

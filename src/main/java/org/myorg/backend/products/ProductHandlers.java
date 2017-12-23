@@ -66,14 +66,18 @@ public class ProductHandlers {
             final SQLConnection conn = connResult.result();
             try {
                 conn.query("SELECT * FROM product", event -> {
-                    final ResultSet results = event.result();
-                    final List<JsonObject> rows = results.getRows();
-                    final int numrows = rows.get(0).getInteger("c", -1);
-                    logger.info("Fetched "+numrows+" products from the product table = ");
+                    try {
+                        final ResultSet results = event.result();
+                        final List<JsonObject> rows = results.getRows();
+                        final int numrows = rows.get(0).getInteger("c", -1);
+                        logger.info("Fetched "+numrows+" products from the product table = ");
+                    } catch (final Throwable t) {
+                        logger.error("Exception handling SELECT results", t);
+                        conn.close();
+                    }
                 });
             } catch (final Throwable t) {
-                logger.error("Could not fetch products from the table:  Is the table missing?", t);
-            } finally {
+                logger.error("Could not fetch products from the table: Is the table missing?", t);
                 conn.close();
             }
         });
