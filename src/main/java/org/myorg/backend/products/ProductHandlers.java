@@ -14,8 +14,6 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import io.vertx.ext.asyncsql.AsyncSQLClient;
-import io.vertx.ext.asyncsql.MySQLClient;
 import io.vertx.ext.sql.ResultSet;
 import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.web.Router;
@@ -45,32 +43,24 @@ public class ProductHandlers {
     }
 
 
-    /*
-     * Set up the database and the product table:
-       CREATE DATABASE IF NOT EXISTS VX;
-       CREATE TABLE vx.product (
-         id varchar(2) NOT NULL,
-         name varchar(50)
-         );
-       INSERT INTO vx.product VALUES ('sd', 'Silly Doileys'), ('tn', 'Tidy Nappies');
+    /**
+     * Reads in the initial data set up in
      */
-
-
     private void setUpInitialData() {
-        final JsonObject mySQLClientConfig = new JsonObject().put("localhost", "mymysqldb.mycompany");
-        final AsyncSQLClient mySQLClient = MySQLClient.createShared(vertx, mySQLClientConfig);
-        mySQLClient.getConnection(connResult -> {
+        MySqlDataSource.getInstance().getConnection(connResult -> {
             if ((connResult == null) || !connResult.succeeded()) { // couldn't get a connection
                 return;  // init already reported this...
             }
+            logger.debug("ProductHandler.setUpInitialData...");
             final SQLConnection conn = connResult.result();
             try {
                 conn.query("SELECT * FROM product", event -> {
                     try {
                         final ResultSet results = event.result();
                         final List<JsonObject> rows = results.getRows();
-                        final int numrows = rows.get(0).getInteger("c", -1);
-                        logger.info("Fetched "+numrows+" products from the product table = ");
+                        for (final JsonObject row: rows)
+                            products.put(row.getString("id"), row);
+                        logger.info("Fetched "+rows.size()+" ("+products.size()+") products from the product table");
                     } catch (final Throwable t) {
                         logger.error("Exception handling SELECT results", t);
                         conn.close();
@@ -123,10 +113,10 @@ public class ProductHandlers {
     }
 
 
-    static final boolean giveCallerJSON = false;  // else HTML
+    static final boolean giveCallerJSON = false;  // set to false to test w/o front-end
 
     /**
-     * Just an example of getting a list
+     * Just an example of getting a list of products
      */
     private void handleGetProductList(RoutingContext routingContext) {
         if (giveCallerJSON) {
@@ -144,7 +134,12 @@ public class ProductHandlers {
             } else {
                 sb.append("<ol>\n");
                 products.forEach((k, v) -> {
-                    sb.append("<li>").append(v.getString("name")).append("</li>\n");
+                    final String id = v.getString("id");
+                    final String name = v.getString("name");
+                    sb.append("<li>")
+                    .append("[ ").append(id).append(" ] &nbsp; ")
+                    .append("<a href=\"/products/").append(id).append("\">").append(name).append("</a>")
+                    .append("</li>\n");
                 });
                 sb.append("</ol>\n");
             }

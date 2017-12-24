@@ -45,13 +45,20 @@ public class MySqlDataSource {
     }
 
 
+    public static MySqlDataSource getInstance() {
+        return dataSource;
+    }
+
     private MySqlDataSource(Vertx vertx) {
         final String username = AppProperty.MysqlDBUsername.getString();
         final String password = AppProperty.MysqlDBPassword.getString();
-        final String userPass = username + (password.isEmpty() ? "" : ("/" + password));
+        final String userPass = username + (password.isEmpty() ? "" : (" --password=" + password));
         final String dbname = AppProperty.MysqlDBName.getString();
         final String host = AppProperty.MysqlDBHost.getString();
         final int port = AppProperty.MysqlDBPort.getInt();
+
+        if (password.isEmpty())
+            logger.info("Probably the mysql library cannot handle not having a password...");
 
         connectionString = "mysql -u "+userPass+" --bind-address "+host+":"+port+" -A -D "+dbname;
         final JsonObject config = new JsonObject()
